@@ -1,0 +1,158 @@
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>My leaflet map</title>
+ <link rel="stylesheet" href="styles.css">
+<!--1. link to leaflet (css/js) -->
+ <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+ <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+ 
+ <style>
+ body {
+ 
+ padding: 0;
+ margin: 0;
+ }
+ 
+ html,
+ body,
+ #map {
+ height: 100%;
+ width: 100%;
+ }
+ </style>
+</head>
+<body>
+<!--2. div map area -->
+ <div id="map"></div>
+ 
+<!-- 3. Map view -->
+ <script>
+ 
+// 4. Set center and zoom
+ 
+// var map = L.map('map').setView([13.743796074955224, 100.56520791561154], 14,);
+// var map = L.map("map", {center: [13.743796074955224, 100.56520791561154], zoom: 17});
+ 
+// 5. add based map
+ 
+// var OSM = L.tileLayer(
+// "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", 
+// {attribution: "&copy; OpenStreetMap"}
+// ).addTo(map);
+ 
+// 6. Layer Groups
+var OSM = L.tileLayer(
+ "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", 
+ {attribution: "&copy; OpenStreetMap"}
+);
+ 
+var OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+	maxZoom: 17,
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
+
+var Esri_WorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+});
+ 
+//รวมญาติ base map ให้ user เลือกได้ 2 อัน
+var baseLayers = {
+ "OSM": OSM,
+ "OpenTopoMap": OpenTopoMap,
+ "Esri_WorldStreetMap": Esri_WorldStreetMap,
+ // "Topo":OpenTopoMap
+ };
+ 
+// create those base layers and add the default ones to the map 
+var map = L.map("map", {center: [13.743796074955224, 100.56520791561154], zoom: 17,layers: [OSM]});
+ 
+// 7. create a Layers Control and add it to the map 
+ 
+L.control.layers(baseLayers).addTo(map);
+ 
+// 8. Adding markers
+// 8.1 add marker
+var point = L.marker([13.753172822181378, 100.50490433478588],
+ {
+ draggable: true, // Make the icon dragable ให้ user ลากได้
+ title: 'ทิพย์สมัยผัดไทยประตูผี', // Add a title
+ opacity: 1.5
+ } // Adjust the opacity
+ ).addTo(map);
+ // 8.2 add pop up on marker
+ point.bindPopup("<b>ทิพย์สมัยผัดไทยประตูผี</b><br>ถนนอโศก")
+ .openPopup(); 
+ 
+ // 8.3 add multi points
+var swu = [
+ ["อีกา LAB", 13.739097173417008, 100.50633431390364],
+ ["โรงเต้าหู้ เยาวราช", 13.742637484542687, 100.51056101639708],
+ ["Texas Suki", 13.740862477063319, 100.51101981906153],
+ ["Luk kai thong", 13.732063319357689, 100.51058903720893],
+ ["Tipsamai Padthai", 13.753172822181378, 100.50490433478588],
+ ["Jae O", 13.74366768754569, 100.52250033813426],
+
+];
+ 
+// 8.4 change icon
+ var greenIcon = L.icon({
+iconUrl: 'https://em-content.zobj.net/thumbs/120/apple/354/lemon_1f34b.png',
+shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+ 
+iconSize: [50, 50], // size of the icon
+shadowSize: [50, 64], // size of the shadow
+iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+shadowAnchor: [4, 62], // the same for the shadow
+popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+// 8.4 add multi pop up
+for (var i = 0; i < swu.length; i++) {
+ 
+marker = new L.marker([swu[i][1], swu[i][2]], {icon: greenIcon})
+ .bindPopup(swu[i][0])
+ .addTo(map);
+}
+ 
+// 8.5 add circleMarker and adjust attribute ไฮไลท์จุดสำคัญ
+var point = L.circleMarker(
+ [13.744159848932307, 100.5625199438237],
+ {title :'BB Building',
+ radius: 30, 
+ color: "blue", 
+ fillColor: "green"}
+).addTo(map);
+ 
+// 10. adding polygon clockwise(ตามเข็นนาฬิกา) start/stop จุดเดียวกัน
+var polygon = L.polygon(
+ [
+ [13.7456713251864, 100.5643182593378], 
+ [13.745459474111142, 100.56535841489116],
+ [13.743846147578878, 100.56497254991383], 
+ [13.744019972486734, 100.56394917719977],
+ [13.7456713251864, 100.5643182593378] 
+ ], 
+ {color: "red", fillColor: "red", weight: 4}
+).addTo(map);
+ 
+// 10.1 add pop up on polygon
+//polygon.bindPopup("<b>สนามฟุตบอล</b>")
+ //.openPopup(); 
+ 
+// 11. add description 
+var legend = L.control({position: "bottomleft"});
+legend.onAdd = function(map) {
+ var div = L.DomUtil.create("div", "legend");
+ div.innerHTML = 
+ '<p><b>Srinakharinwirot university</b></p><hr>' +
+ 'Created by Duangsatpron Prempiyakit<br>' +
+ '<img src="https://unity.swu.ac.th/wp-content/uploads/2020/07/SWU_Logo_EN_Color.png" width = 50%>';
+ return div;
+};
+legend.addTo(map);
+ 
+ </script>
+</body>
+</html>
